@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0d0d0d">
+<title>DompetKu</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --border: #2a2a2a;
+    --accent: #c8ff00;
+    --accent-dim: rgba(200,255,0,0.12);
+    --red: #ff4d6d;
+    --red-dim: rgba(255,77,109,0.12);
+    --green: #c8ff00;
+    --text: #f0f0f0;
+    --text-muted: #666;
+    --text-dim: #999;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    max-width: 430px;
+    margin: 0 auto;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 52px 20px 20px;
+    position: relative;
+  }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 28px;
+  }
+  .app-name {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  .date-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--surface2);
+    padding: 5px 10px;
+    border-radius: 20px;
+  }
+
+  /* BALANCE CARD */
+  .balance-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .balance-card::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 160px; height: 160px;
+    background: radial-gradient(circle, rgba(200,255,0,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .balance-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .balance-amount {
+    font-family: 'DM Mono', monospace;
+    font-size: 36px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .balance-amount span {
+    font-size: 18px;
+    color: var(--text-dim);
+  }
+  .balance-month {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+  .balance-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .stat {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+  }
+  .stat-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .stat-label.in { color: var(--green); }
+  .stat-label.out { color: var(--red); }
+  .stat-amount {
+    font-family: 'DM Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  /* QUICK ADD */
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding: 0 20px;
+  }
+
+  .quick-add {
+    padding: 0 20px;
+    margin-bottom: 24px;
+  }
+  .type-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 4px;
+    margin-bottom: 14px;
+  }
+  .type-btn {
+    padding: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .type-btn.active-in {
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+  .type-btn.active-out {
+    background: var(--red-dim);
+    color: var(--red);
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .input-field {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 13px 14px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .input-field:focus { border-color: var(--accent); }
+  .input-field::placeholder { color: var(--text-muted); font-family: 'Syne', sans-serif; font-size: 13px; }
+
+  select.input-field {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+
+  .add-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .add-btn.type-in {
+    background: var(--accent);
+    color: #0d0d0d;
+  }
+  .add-btn.type-out {
+    background: var(--red);
+    color: #fff;
+  }
+  .add-btn:active { transform: scale(0.98); opacity: 0.9; }
+
+  /* TRANSACTIONS */
+  .transactions {
+    padding: 0 20px 100px;
+  }
+  .tx-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .tx-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideIn 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .tx-item::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+  .tx-item.in::before { background: var(--accent); }
+  .tx-item.out::before { background: var(--red); }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .tx-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .tx-item.in .tx-icon { background: var(--accent-dim); }
+  .tx-item.out .tx-icon { background: var(--red-dim); }
+
+  .tx-info { flex: 1; min-width: 0; }
+  .tx-desc {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .tx-meta {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-top: 2px;
+  }
+  .tx-cat {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    background: var(--surface2);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .tx-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  .tx-amount {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .tx-item.in .tx-amount { color: var(--accent); }
+  .tx-item.out .tx-amount { color: var(--red); }
+
+  .tx-del {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: color 0.15s;
+    flex-shrink: 0;
+  }
+  .tx-del:active { color: var(--red); }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--text-muted);
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-text { font-size: 14px; }
+
+  /* FILTER */
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    padding: 0 20px;
+    margin-bottom: 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .filter-bar::-webkit-scrollbar { display: none; }
+  .filter-chip {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .filter-chip.active {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* BOTTOM SAFE AREA */
+  .bottom-spacer { height: env(safe-area-inset-bottom, 20px); }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 20px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="app-name">DompetKu</div>
+    <div class="date-badge" id="dateLabel"></div>
+  </div>
+
+  <div class="balance-card">
+    <div class="balance-label">Saldo Saat Ini</div>
+    <div class="balance-amount" id="balanceDisplay"><span>Rp</span> 0</div>
+    <div class="balance-month" id="monthLabel"></div>
+    <div class="balance-stats">
+      <div class="stat">
+        <div class="stat-label in">▲ Pemasukan</div>
+        <div class="stat-amount" id="totalIn">Rp 0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label out">▼ Pengeluaran</div>
+        <div class="stat-amount" id="totalOut">Rp 0</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUICK ADD -->
+<div class="quick-add">
+  <div class="type-toggle">
+    <button class="type-btn active-in" id="btnIn" onclick="setType('in')">+ Pemasukan</button>
+    <button class="type-btn" id="btnOut" onclick="setType('out')">− Pengeluaran</button>
+  </div>
+  <div class="input-row">
+    <input class="input-field" type="text" id="inputDesc" placeholder="Keterangan…" maxlength="40">
+    <input class="input-field" type="number" id="inputAmount" placeholder="Jumlah" inputmode="numeric" style="max-width:130px">
+  </div>
+  <div class="input-row">
+    <select class="input-field" id="inputCat">
+      <option value="">— Kategori —</option>
+    </select>
+  </div>
+  <button class="add-btn type-in" id="addBtn" onclick="addTransaction()">Tambah Pemasukan</button>
+</div>
+
+<!-- FILTER -->
+<div class="section-title">Riwayat Transaksi</div>
+<div class="filter-bar" id="filterBar">
+  <div class="filter-chip active" onclick="setFilter('semua', this)">Semua</div>
+  <div class="filter-chip" onclick="setFilter('in', this)">Pemasukan</div>
+  <div class="filter-chip" onclick="setFilter('out', this)">Pengeluaran</div>
+</div>
+
+<!-- TRANSACTIONS -->
+<div class="transactions">
+  <div class="tx-list" id="txList"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CATS = {
+  in:  ['💼 Gaji','💰 Bonus','🎁 Hadiah','📈 Investasi','🏠 Sewa','💵 Lainnya'],
+  out: ['🍔 Makan','🚗 Transport','🛍 Belanja','💊 Kesehatan','⚡ Tagihan','🎮 Hiburan','📚 Pendidikan','🏠 Rumah','💸 Lainnya']
+};
+
+let txType = 'in';
+let filterMode = 'semua';
+let transactions = JSON.parse(localStorage.getItem('dompetku_tx') || '[]');
+
+function init() {
+  const now = new Date();
+  document.getElementById('dateLabel').textContent = now.toLocaleDateString('id-ID', {weekday:'short', day:'numeric', month:'short', year:'numeric'});
+  document.getElementById('monthLabel').textContent = now.toLocaleDateString('id-ID', {month:'long', year:'numeric'});
+  setType('in');
+  render();
+}
+
+function setType(t) {
+  txType = t;
+  const inBtn = document.getElementById('btnIn');
+  const outBtn = document.getElementById('btnOut');
+  const addBtn = document.getElementById('addBtn');
+  const cat = document.getElementById('inputCat');
+
+  inBtn.className = 'type-btn' + (t === 'in' ? ' active-in' : '');
+  outBtn.className = 'type-btn' + (t === 'out' ? ' active-out' : '');
+  addBtn.className = 'add-btn ' + (t === 'in' ? 'type-in' : 'type-out');
+  addBtn.textContent = t === 'in' ? 'Tambah Pemasukan' : 'Tambah Pengeluaran';
+
+  cat.innerHTML = '<option value="">— Kategori —</option>';
+  CATS[t].forEach(c => {
+    const o = document.createElement('option');
+    o.value = c; o.textContent = c;
+    cat.appendChild(o);
+  });
+}
+
+function setFilter(mode, el) {
+  filterMode = mode;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+function fmt(n) {
+  return 'Rp ' + Math.abs(n).toLocaleString('id-ID');
+}
+
+function addTransaction() {
+  const desc = document.getElementById('inputDesc').value.trim();
+  const amount = parseFloat(document.getElementById('inputAmount').value);
+  const cat = document.getElementById('inputCat').value;
+
+  if (!desc) { showToast('⚠️ Isi keterangan dulu!'); return; }
+  if (!amount || amount <= 0) { showToast('⚠️ Jumlah harus lebih dari 0!'); return; }
+
+  const tx = {
+    id: Date.now(),
+    type: txType,
+    desc,
+    amount,
+    cat: cat || (txType === 'in' ? '💵 Lainnya' : '💸 Lainnya'),
+    time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}),
+    date: new Date().toLocaleDateString('id-ID', {day:'numeric', month:'short'})
+  };
+
+  transactions.unshift(tx);
+  save();
+  document.getElementById('inputDesc').value = '';
+  document.getElementById('inputAmount').value = '';
+  document.getElementById('inputCat').value = '';
+  showToast(txType === 'in' ? '✅ Pemasukan ditambahkan!' : '✅ Pengeluaran dicatat!');
+  render();
+}
+
+function deleteTransaction(id) {
+  transactions = transactions.filter(t => t.id !== id);
+  save();
+  render();
+}
+
+function save() {
+  localStorage.setItem('dompetku_tx', JSON.stringify(transactions));
+}
+
+function render() {
+  const list = document.getElementById('txList');
+  const totalInEl = document.getElementById('totalIn');
+  const totalOutEl = document.getElementById('totalOut');
+  const balanceEl = document.getElementById('balanceDisplay');
+
+  const totalIn = transactions.filter(t => t.type === 'in').reduce((s, t) => s + t.amount, 0);
+  const totalOut = transactions.filter(t => t.type === 'out').reduce((s, t) => s + t.amount, 0);
+  const balance = totalIn - totalOut;
+
+  totalInEl.textContent = fmt(totalIn);
+  totalOutEl.textContent = fmt(totalOut);
+  balanceEl.innerHTML = `<span>Rp</span> ${balance.toLocaleString('id-ID')}`;
+  balanceEl.style.color = balance < 0 ? 'var(--red)' : 'var(--text)';
+
+  const filtered = filterMode === 'semua' ? transactions : transactions.filter(t => t.type === filterMode);
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">Belum ada transaksi</div></div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(t => `
+    <div class="tx-item ${t.type}">
+      <div class="tx-icon">${t.cat.split(' ')[0]}</div>
+      <div class="tx-info">
+        <div class="tx-desc">${t.desc}</div>
+        <div class="tx-meta">
+          <span class="tx-cat">${t.cat.replace(/^\S+\s/, '')}</span>
+          <span class="tx-time">${t.date} · ${t.time}</span>
+        </div>
+      </div>
+      <div class="tx-amount">${t.type === 'in' ? '+' : '−'}${fmt(t.amount)}</div>
+      <button class="tx-del" onclick="deleteTransaction(${t.id})">✕</button>
+    </div>
+  `).join('');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+init();
+</script>
+</body>
+</html>
